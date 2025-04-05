@@ -6,13 +6,16 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { toast } from "@/hooks/use-toast"
-import { CheckCircle, XCircle, BarChart } from "lucide-react"
+import { CheckCircle, BookOpen, BarChart } from "lucide-react"
 
 interface Stats {
   totalWords: number
-  knownWords: number
-  unknownWords: number
+  learningWords: number
+  wellKnownWords: number
+  learningInProgress: number
   completionRate: number
+  masteryRate: number
+  wordHistory: Record<string, number>
 }
 
 export default function StatsPage() {
@@ -20,109 +23,57 @@ export default function StatsPage() {
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<Stats>({
     totalWords: 0,
-    knownWords: 0,
-    unknownWords: 0,
+    learningWords: 0,
+    wellKnownWords: 0,
+    learningInProgress: 0,
     completionRate: 0,
+    masteryRate: 0,
+    wordHistory: {}
   })
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userid, setUserid] = useState("")
 
   useEffect(() => {
-    // 로그인 상태 확인
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true"
-    setIsLoggedIn(loggedIn)
+    const storedUserid = localStorage.getItem("userid")
+    if (storedUserid) {
+      setUserid(storedUserid)
+    }
 
-    // 로컬 스토리지에서 단어 상태 불러와서 통계 계산
-    const calculateStats = () => {
+    const fetchStats = async () => {
       try {
-        const savedWordsJSON = localStorage.getItem("toeicWords")
-
-        if (savedWordsJSON) {
-          const savedWords = JSON.parse(savedWordsJSON)
-
-          const totalWords = savedWords.length
-          const knownWords = savedWords.filter((word: any) => word.isKnown === true).length
-          const unknownWords = savedWords.filter((word: any) => word.isKnown === false).length
-          const completionRate = totalWords > 0 ? ((knownWords + unknownWords) / totalWords) * 100 : 0
-
-          setStats({
-            totalWords,
-            knownWords,
-            unknownWords,
-            completionRate,
-          })
-        } else {
-          // 저장된 단어가 없는 경우 기본값 사용
-          setStats({
-            totalWords: 15, // 샘플 단어 수
-            knownWords: 0,
-            unknownWords: 0,
-            completionRate: 0,
-          })
+        const response = await fetch('/api/get-stats', {
+          credentials: 'include'  // 쿠키 포함
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch stats');
         }
+
+        const data = await response.json();
+        setStats(data);
       } catch (error) {
-        console.error("Error calculating stats:", error)
+        console.error("Error fetching stats:", error);
         toast({
           title: "오류 발생",
-          description: "통계를 계산하는데 실패했습니다.",
+          description: "통계를 불러오는데 실패했습니다.",
           variant: "destructive",
-        })
+        });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    calculateStats()
-  }, [])
-
-  const resetAllProgress = () => {
-    try {
-      // 로컬 스토리지에서 단어 가져오기
-      const savedWordsJSON = localStorage.getItem("toeicWords")
-
-      if (savedWordsJSON) {
-        const savedWords = JSON.parse(savedWordsJSON)
-
-        // 모든 단어의 학습 상태 초기화
-        const resetWords = savedWords.map((word: any) => ({
-          ...word,
-          isKnown: undefined,
-        }))
-
-        // 초기화된 단어 저장
-        localStorage.setItem("toeicWords", JSON.stringify(resetWords))
-
-        // 통계 초기화
-        setStats({
-          totalWords: resetWords.length,
-          knownWords: 0,
-          unknownWords: 0,
-          completionRate: 0,
-        })
-
-        toast({
-          title: "초기화 완료",
-          description: "모든 단어의 학습 상태가 초기화되었습니다.",
-        })
-      }
-    } catch (error) {
-      console.error("Error resetting progress:", error)
-      toast({
-        title: "오류 발생",
-        description: "학습 상태 초기화에 실패했습니다.",
-        variant: "destructive",
-      })
-    }
-  }
+    fetchStats();
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn")
-    localStorage.removeItem("userEmail")
-    setIsLoggedIn(false)
+    // JWT 토큰 쿠키 삭제
+    document.cookie = "auth=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    localStorage.removeItem("userid");
+    router.push("/login");
     toast({
       title: "로그아웃",
       description: "로그아웃 되었습니다.",
-    })
-    router.push("/login")
+    });
   }
 
   if (loading) {
@@ -142,33 +93,30 @@ export default function StatsPage() {
               <BarChart className="h-5 w-5 md:h-6 md:w-6" />
               <CardTitle className="text-xl md:text-2xl font-bold">학습 통계</CardTitle>
             </div>
-            {isLoggedIn && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                className="text-white hover:text-primary-100 h-8 text-xs md:text-sm px-2 touch-target"
-              >
-                로그아웃
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="text-white hover:text-primary-100 h-8 text-xs md:text-sm px-2 touch-target"
+            >
+              로그아웃
+            </Button>
           </div>
           <CardDescription className="text-primary-100 text-xs md:text-sm mt-1">
-            {isLoggedIn
-              ? `${localStorage.getItem("userEmail")} 님의 TOEIC 단어 학습 현황`
-              : "TOEIC 단어 학습 현황을 확인하세요"}
+            {userid} 님의 TOEIC 단어 학습 현황
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 md:space-y-6 p-3 md:p-6">
           <div>
             <div className="mb-1 md:mb-2 flex justify-between">
-              <span className="text-primary-700 text-xs md:text-sm">전체 진행률</span>
-              <span className="font-bold text-primary text-xs md:text-sm">{stats.completionRate.toFixed(1)}%</span>
+              <span className="text-primary-700 text-xs md:text-sm">전체 학습 진행률</span>
+              <span className="font-bold text-primary text-xs md:text-sm">
+                {stats.completionRate.toFixed(1)}%
+              </span>
             </div>
             <Progress
               value={stats.completionRate}
               className="h-2 md:h-3 bg-primary-200"
-              indicatorClassName="bg-primary"
             />
           </div>
 
@@ -177,15 +125,22 @@ export default function StatsPage() {
               <div className="flex justify-center mb-1 md:mb-2">
                 <CheckCircle className="h-5 w-5 md:h-6 md:w-6 text-green-500" />
               </div>
-              <p className="text-xs md:text-sm text-green-700">아는 단어</p>
-              <p className="text-xl md:text-2xl font-bold text-green-600">{stats.knownWords}</p>
+              <p className="text-xs md:text-sm text-green-700">잘 아는 단어</p>
+              <p className="text-xl md:text-2xl font-bold text-green-600">
+                {stats.wellKnownWords}
+              </p>
+              <p className="text-[10px] md:text-xs text-green-600 mt-1">
+                {stats.masteryRate.toFixed(1)}%
+              </p>
             </div>
-            <div className="rounded-lg bg-red-50 p-3 md:p-4 text-center border border-red-200 shadow-sm">
+            <div className="rounded-lg bg-yellow-50 p-3 md:p-4 text-center border border-yellow-200 shadow-sm">
               <div className="flex justify-center mb-1 md:mb-2">
-                <XCircle className="h-5 w-5 md:h-6 md:w-6 text-red-500" />
+                <BookOpen className="h-5 w-5 md:h-6 md:w-6 text-yellow-500" />
               </div>
-              <p className="text-xs md:text-sm text-red-700">모르는 단어</p>
-              <p className="text-xl md:text-2xl font-bold text-red-600">{stats.unknownWords}</p>
+              <p className="text-xs md:text-sm text-yellow-700">학습 중</p>
+              <p className="text-xl md:text-2xl font-bold text-yellow-600">
+                {stats.learningInProgress}
+              </p>
             </div>
           </div>
 
@@ -193,7 +148,7 @@ export default function StatsPage() {
             <p className="text-xs md:text-sm text-primary-700">전체 단어</p>
             <p className="text-xl md:text-2xl font-bold text-primary">{stats.totalWords}</p>
             <p className="text-[10px] md:text-xs text-primary-600 mt-1">
-              학습 완료: {stats.knownWords + stats.unknownWords} / {stats.totalWords}
+              학습 시작: {stats.learningWords} / {stats.totalWords}
             </p>
           </div>
 
@@ -203,12 +158,6 @@ export default function StatsPage() {
               className="bg-primary hover:bg-primary-700 text-white h-9 md:h-10 text-xs md:text-sm w-full sm:w-auto touch-target"
             >
               학습으로 돌아가기
-            </Button>
-            <Button
-              onClick={resetAllProgress}
-              className="bg-secondary hover:bg-secondary-700 text-white h-9 md:h-10 text-xs md:text-sm w-full sm:w-auto touch-target"
-            >
-              모든 진행 초기화
             </Button>
           </div>
         </CardContent>

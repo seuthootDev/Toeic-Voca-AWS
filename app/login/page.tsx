@@ -15,7 +15,7 @@ export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   })
 
@@ -29,31 +29,42 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      // 실제 로그인 로직 대신 성공 메시지 표시 후 대시보드로 이동
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message)
+      }
+
       toast({
         title: "로그인 성공",
         description: "단어 학습 페이지로 이동합니다.",
       })
 
-      // 로그인 상태 로컬 스토리지에 저장 (실제 인증 대신 임시 방법)
       localStorage.setItem("isLoggedIn", "true")
-      localStorage.setItem("userEmail", formData.email)
+      localStorage.setItem("userid", data.user.userid)
 
       router.push("/dashboard")
     } catch (error) {
       toast({
-        title: "오류 발생",
-        description: "로그인 중 문제가 발생했습니다. 다시 시도해주세요.",
+        title: "로그인 실패",
+        description: error instanceof Error ? error.message : "로그인 중 문제가 발생했습니다.",
         variant: "destructive",
       })
     } finally {
       setIsLoading(false)
     }
-  }
-
-  // 로그인 없이 바로 대시보드로 이동하는 함수
-  const skipLogin = () => {
-    router.push("/dashboard")
   }
 
   return (
@@ -73,16 +84,16 @@ export default function LoginPage() {
         <CardContent className="pt-4 md:pt-6 p-4 md:p-6">
           <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
             <div className="space-y-1 md:space-y-2">
-              <Label htmlFor="email" className="text-primary-700 text-sm md:text-base">
-                이메일
+              <Label htmlFor="username" className="text-primary-700 text-sm md:text-base">
+                아이디
               </Label>
               <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="example@email.com"
+                id="username"
+                name="username"
+                type="text"
+                placeholder="사용자 아이디"
                 required
-                value={formData.email}
+                value={formData.username}
                 onChange={handleChange}
                 className="border-primary-200 focus:border-primary focus:ring-primary h-9 md:h-10 touch-target"
               />
@@ -117,15 +128,6 @@ export default function LoginPage() {
               {isLoading ? "로그인 중..." : "로그인"}
             </Button>
           </form>
-          <div className="mt-3 md:mt-4 text-center">
-            <Button
-              variant="link"
-              onClick={skipLogin}
-              className="text-secondary hover:text-secondary-700 text-sm md:text-base p-0 h-auto touch-target"
-            >
-              로그인 없이 계속하기
-            </Button>
-          </div>
           <div className="mt-3 md:mt-4 text-center text-xs md:text-sm">
             계정이 없으신가요?{" "}
             <Link href="/register" className="text-primary hover:underline touch-target">
