@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { verify } from 'jsonwebtoken';
 
-const uri = "mongodb+srv://seuthootdev:1234@cluster0.8vhcqdt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = `mongodb+srv://seuthootdev:${process.env.MONGODB_PASSWORD}@cluster0.8vhcqdt.mongodb.net/?retryWrites=true&w=majority`;
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
