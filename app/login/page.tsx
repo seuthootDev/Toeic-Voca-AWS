@@ -103,12 +103,6 @@ export default function LoginPage() {
                 <Label htmlFor="password" className="text-primary-700 text-sm md:text-base">
                   비밀번호
                 </Label>
-                <Link
-                  href="/forgot-password"
-                  className="ml-auto inline-block text-xs md:text-sm text-primary hover:underline"
-                >
-                  비밀번호 찾기
-                </Link>
               </div>
               <Input
                 id="password"

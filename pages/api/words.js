@@ -43,7 +43,8 @@ export default async function handler(req, res) {
       const calculateWeight = (wordId) => {
         if (!userid) return 10; // 로그인하지 않은 경우 모든 단어의 가중치를 동일하게
         const history = wordHistory[wordId] || 0;
-        return Math.max(1, 10 - Math.floor(history));
+        if (history >= 3) return 1; // 3번 이상 맞춘 단어는 최저 가중치
+        return 10 + (3 - history) * 5; // 덜 학습한 단어에 더 높은 가중치
       };
 
       // 가중치 기반으로 단어 선택
@@ -52,17 +53,19 @@ export default async function handler(req, res) {
         weight: calculateWeight(word._id.toString())
       }));
 
-      // 가중치에 따라 단어 정렬
-      weightedWords.sort((a, b) => b.weight - a.weight);
+      // 가중치가 높은 단어들(덜 학습한 단어들) 먼저 필터링
+      const availableWords = weightedWords.filter(word => word.weight > 1);
 
-      // 상위 50개 단어 선택
-      const selectedWords = weightedWords.slice(0, 5);
-      
-      // 선택된 단어들 랜덤 섞기
-      const shuffledWords = selectedWords.sort(() => Math.random() - 0.5);
+      // 학습할 단어가 부족한 경우를 대비해 기본 단어들도 포함
+      const wordsToChooseFrom = availableWords.length >= 5 ? availableWords : weightedWords;
+
+      // 랜덤하게 5개 선택
+      const selectedWords = wordsToChooseFrom
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 5);
 
       // 데이터 변환
-      const formattedWords = shuffledWords.map(word => ({
+      const formattedWords = selectedWords.map(word => ({
         id: word._id.toString(),
         english: word['단어'],
         korean: word['뜻'],
