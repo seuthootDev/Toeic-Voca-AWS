@@ -6,6 +6,21 @@ TOEIC 단어 학습을 위한 웹 애플리케이션입니다. 사용자별 학�
 AWS 클라우드 배포용 저장소 : https://github.com/seuthootDev/toeic-voca-aws
 온 프레미스 배포용 저장소 : https://github.com/seuthootDev/toeic-voca-onprem
 
+## 스크린샷
+
+### 로그인 페이지
+![로그인 페이지](screenshots/1.png)
+
+### 대시보드 페이지
+![대시보드 페이지1](screenshots/2.png)
+![대시보드 페이지2](screenshots/3.png)
+
+### 학습 결과 페이지
+![학습 결과 페이지](screenshots/4.png)
+
+### 학습 통계 페이지
+![학습 통계 페이지](screenshots/5.png)
+
 ## 주요 기능
 
 - 사용자별 맞춤형 단어 학습
