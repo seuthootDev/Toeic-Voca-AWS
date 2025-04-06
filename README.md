@@ -1,9 +1,9 @@
 # TOEIC 단어장
 
-TOEIC 단어 학습을 위한 웹 애플리케이션입니다. 사용자별 학습 이력을 기반으로 효율적인 단어 학습을 제공합니다.
+TOEIC 단어 학습을 위한 웹 애플리케이션입니다. <br>사용자별 학습 이력을 기반으로 효율적인 단어 학습을 제공합니다.<br>
 본 저장소는 Vercel 배포용입니다.
 
-AWS 클라우드 배포용 저장소 : https://github.com/seuthootDev/toeic-voca-aws
+AWS 클라우드 배포용 저장소 : https://github.com/seuthootDev/toeic-voca-aws <br>
 온 프레미스 배포용 저장소 : https://github.com/seuthootDev/toeic-voca-onprem
 
 ## 스크린샷
