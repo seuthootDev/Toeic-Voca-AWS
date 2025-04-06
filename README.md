@@ -39,7 +39,7 @@ AWS 클라우드 배포용 저장소 : https://github.com/seuthootDev/toeic-voca
 
 - **백엔드**
   - Next.js API Routes
-  - MongoDB
+  - MongoDB Atlas
   - JWT 인증
 
 ## 시작하기
