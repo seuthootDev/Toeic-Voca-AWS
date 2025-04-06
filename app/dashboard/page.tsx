@@ -290,13 +290,6 @@ export default function Dashboard() {
         <div className="flex flex-wrap md:flex-nowrap justify-between gap-2">
           <Button
             variant="outline"
-            onClick={() => router.push("/stats")}
-            className="border-primary text-primary hover:bg-primary-100 text-xs md:text-sm h-8 md:h-10 flex-1 touch-target"
-          >
-            학습 통계
-          </Button>
-          <Button
-            variant="outline"
             onClick={resetProgress}
             className="border-secondary text-secondary hover:bg-secondary-100 text-xs md:text-sm h-8 md:h-10 flex-1 touch-target"
           >
@@ -307,7 +300,7 @@ export default function Dashboard() {
             onClick={() => router.push("/stats")}
             className="border-primary text-primary hover:bg-primary-100 text-xs md:text-sm h-8 md:h-10 flex-1 touch-target"
           >
-            종료하기
+            학습 통계
           </Button>
         </div>
       </div>

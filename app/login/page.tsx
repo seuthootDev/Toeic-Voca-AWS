@@ -95,6 +95,7 @@ export default function LoginPage() {
                 required
                 value={formData.username}
                 onChange={handleChange}
+                autoComplete="off"
                 className="border-primary-200 focus:border-primary focus:ring-primary h-9 md:h-10 touch-target"
               />
             </div>
@@ -108,9 +109,11 @@ export default function LoginPage() {
                 id="password"
                 name="password"
                 type="password"
+                placeholder="비밀번호"
                 required
                 value={formData.password}
                 onChange={handleChange}
+                autoComplete="off"
                 className="border-primary-200 focus:border-primary focus:ring-primary h-9 md:h-10 touch-target"
               />
             </div>

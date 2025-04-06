@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 
-const uri = `mongodb+srv://seuthootdev:${process.env.MONGODB_PASSWORD}@cluster0.8vhcqdt.mongodb.net/?retryWrites=true&w=majority`;
+const uri = process.env.MONGODB_URI;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
