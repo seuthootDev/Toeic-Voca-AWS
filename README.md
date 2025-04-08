@@ -76,7 +76,7 @@ npm run build
 ## 7. 접속 확인
 
 - S3 정적 웹사이트 호스팅 URL로 접속
-- 또는 CloudFront 도메인(https://d3pjffpggdwuw9.cloudfront.net)으로 접속 
+- 또는 CloudFront 도메인(https://d3pjffpggdwuw9.cloudfront.net/)으로 접속 
 
 ## 주의사항
 
