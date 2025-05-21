@@ -3,7 +3,7 @@
 TOEIC 단어 학습을 위한 웹 애플리케이션입니다. <br>사용자별 학습 이력을 기반으로 효율적인 단어 학습을 제공합니다.<br>
 본 저장소는 AWS S3 + CloudFront 배포용입니다.
 
-![AWS 아키텍쳐]("aws아키텍쳐")
+![AWS 아키텍쳐](/aws아키텍쳐.png)
 
 Vercel 배포용 저장소 : https://github.com/seuthootDev/Toeic-Voca <br>
 온 프레미스 배포용 저장소 : https://github.com/seuthootDev/Toeic-Voca-onprem
